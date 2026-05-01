@@ -112,8 +112,8 @@ function NewsPage() {
                  <img
                   src={s.image}
      
-      className="absolute inset-0 h-full w-full object-cover"
-    />
+                    className="absolute inset-0 h-full w-full object-cover"
+                   />
                   <span className="inline-flex items-center rounded-full bg-[color:var(--nans-lime)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[color:var(--nans-ink)]">
                     {s.tag}
                   </span>

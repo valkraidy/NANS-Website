@@ -3,6 +3,13 @@ import { Phone, Mail, Globe, ChevronRight } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { EyebrowSoft } from "@/components/site/SectionHeader";
 import logo from "@/assets/nans-logo.png";
+import nana from "@/assets/images/nana.jpg";
+import doc from "@/assets/images/doc.jpg";
+import Charlotte from "@/assets/images/Charlotte.JPG";
+import Isaac from "@/assets/images/Isaac.JPG";
+import Gloria from "@/assets/images/Gloria.JPG";
+import PRO from "@/assets/images/PRO.JPG";
+import Ernest from "@/assets/images/Ernest.JPG";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -17,16 +24,21 @@ export const Route = createFileRoute("/about")({
 });
 
 const TIMELINE = [
-  { y: "2005", t: "The Foundation", d: "Establishment of the first student coordination council in the Nzema region, uniting diverse educational blocks." },
+  { y: "1997", t: "The Foundation", d: "Establishment of the first student coordination council in the Nzema region, uniting diverse educational blocks." },
   { y: "2010", t: "Academic Integration", d: "Launch of the NANS Scholarship Fund, providing vital support for underprivileged undergraduates pursuing higher education." },
   { y: "2026", t: "Vision 2026", d: "Projected completion of the NANS Regional Academic Excellence Hub, a modern center for research and student development." },
 ];
 
 const LEADERS = [
-  { n: "Ernesti Whajah", r: "President", p: "0532388934", grad: "from-amber-300 to-amber-600" },
-  { n: "Charlotte Annor", r: "Vice President", p: "0545848236", grad: "from-rose-300 to-rose-600" },
-  { n: "Gloria O. Mensah", r: "Secretary", p: "0558082643", grad: "from-emerald-300 to-emerald-600" },
-  { n: "Isaac K. Aboagye", r: "Financial Secretary", p: "0538909282", grad: "from-sky-300 to-sky-600" },
+  { n: "Nana Ainoo Kwagyan III", r: "Patron", p: "0532388934", grad: "from-amber-300 to-amber-600",image:nana },
+  { n: "Dr. Clinton Blay", r: "Patron", p: "0545848236",image:doc },
+  { n: "-", r: "Patron", p: "0558082643", grad: "from-emerald-300 to-emerald-600" ,},
+  
+  { n: "Ernesti Whajah", r: "President", p: "0532388934", grad: "from-amber-300 to-amber-600",image:Ernest },
+  { n: "Charlotte Annor", r: "Vice President", p: "0545848236", grad: "from-rose-300 to-rose-600",image:Charlotte  },
+  { n: "Gloria O. Mensah", r: "Secretary", p: "0558082643", grad: "from-emerald-300 to-emerald-600" ,image:Gloria},
+  { n: "Isaac K. Aboagye", r: "Financial Secretary", p: "0538909282", grad: "from-sky-300 to-sky-600" ,image:Isaac},
+  { n: "Richard Blay", r: "P.R.O", p: "0552985941", grad: "from-sky-300 to-sky-600" ,image:PRO},
 ];
 
 function AboutPage() {
@@ -104,10 +116,15 @@ function AboutPage() {
             {LEADERS.map((l) => (
               <div key={l.n} className="rounded-2xl bg-card p-6 text-center shadow-sm ring-1 ring-border">
                 <div className="mx-auto mb-4 inline-block rounded-full p-1 ring-2 ring-[color:var(--nans-lime)]">
-                  <div className={`flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br ${l.grad} font-display text-2xl text-white`}>
-                    {l.n.split(" ").map((p) => p[0]).join("").slice(0,2)}
-                  </div>
-                </div>
+  <div className="relative h-24 w-24 overflow-hidden rounded-full">
+    <img
+      src={l.image}
+      alt={l.n}
+      className="h-full w-full object-cover"
+    />
+  </div>
+</div>
+
                 <h3 className="font-display text-lg">{l.n}</h3>
                 <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[color:var(--nans-green-deep)]">{l.r}</p>
                 <div className="mt-4 inline-flex rounded-full bg-[color:var(--nans-lime)]/40 px-3 py-1 text-xs font-semibold text-[color:var(--nans-ink)]">
