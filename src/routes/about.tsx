@@ -26,7 +26,7 @@ export const Route = createFileRoute("/about")({
 const TIMELINE = [
   { y: "1997", t: "The Foundation", d: "Establishment of the first student coordination council in the Nzema region, uniting diverse educational blocks." },
   { y: "2010", t: "Academic Integration", d: "Launch of the NANS Scholarship Fund, providing vital support for underprivileged undergraduates pursuing higher education." },
-  { y: "2026", t: "Vision 2026", d: "Projected completion of the NANS Regional Academic Excellence Hub, a modern center for research and student development." },
+  { y: "2026", t: "Vision 2026", d: "Establishment of NANS office for administrative work." },
 ];
 
 const LEADERS = [
@@ -34,7 +34,7 @@ const LEADERS = [
   { n: "Dr. Clinton Blay", r: "Patron", p: "0545848236",image:doc },
   { n: "-", r: "Patron", p: "0558082643", grad: "from-emerald-300 to-emerald-600" ,},
   
-  { n: "Ernesti Whajah", r: "President", p: "0532388934", grad: "from-amber-300 to-amber-600",image:Ernest },
+  { n: "Ernest Whajah", r: "President", p: "0532388934", grad: "from-amber-300 to-amber-600",image:Ernest },
   { n: "Charlotte Annor", r: "Vice President", p: "0545848236", grad: "from-rose-300 to-rose-600",image:Charlotte  },
   { n: "Gloria O. Mensah", r: "Secretary", p: "0558082643", grad: "from-emerald-300 to-emerald-600" ,image:Gloria},
   { n: "Isaac K. Aboagye", r: "Financial Secretary", p: "0538909282", grad: "from-sky-300 to-sky-600" ,image:Isaac},
