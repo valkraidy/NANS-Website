@@ -4,6 +4,11 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { Eyebrow } from "@/components/site/SectionHeader";
 import logo from "@/assets/nans-logo.png";
 
+import card1 from "@/assets/images/card1.jpeg";
+import card2 from "@/assets/images/card2.JPG";
+import card3 from "@/assets/images/card3.JPG";
+
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -26,9 +31,16 @@ const STATS = [
 const FOCUS = ["Advocacy", "Skill Development", "Heritage Preservation", "Networking", "Scholarships", "Mentorship"];
 
 const UPDATES = [
-  { tag: "NEWS", date: "April 2026", title: "NANS Membership Card Registration", body: "The NANS Ghana executives has rolled out NANS Membership Card Registration.", tint: "from-[color:var(--nans-green)] to-[color:var(--nans-green-deep)]" },
-  { tag: "EVENT", date: "March 2026", title: "Congratulations to Dr. George Sipah Yankey", body: "NANS congratulates Dr. George Sipah Yankey on his appointment as Board Chairman for Tema Shipyard.", tint: "from-emerald-700 to-emerald-900" },
-  { tag: "NEWS", date: "Oct 10, 2026", title: "NANS Industrial Trip to Adamus", body: "NANS is proud to announce the upcoming industrial trip to Adamus Ghana.", tint: "from-amber-500 to-amber-700" },
+
+  { tag: "NEWS",
+     date: "April 2026",
+      title: "NANS Membership Card Registration",
+       body: "The NANS Ghana executives has rolled out NANS Membership Card Registration.", 
+        image: card1,},
+
+  { tag: "EVENT", date: "March 2026", title: "Congratulations to Dr. George Sipah Yankey", body: "NANS congratulates Dr. George Sipah Yankey on his appointment as Board Chairman for Tema Shipyard." ,image: card2,},
+  { tag: "NEWS", date: "Oct 10, 2025", title: "NANS Industrial Trip to Adamus", body: "NANS is proud to announce the upcoming industrial trip to Adamus Ghana.",image:card3,},
+
 ];
 
 function HomePage() {
@@ -129,7 +141,15 @@ function HomePage() {
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {UPDATES.map((u) => (
               <article key={u.title} className="overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                <div className={`relative aspect-[4/3] bg-gradient-to-br ${u.tint} p-6`}>
+
+                <div className={`relative aspect-[4/3] bg-gradient-to-br p-6`}>
+                 <img
+                  src={u.image}
+     
+      className="absolute inset-0 h-full w-full object-cover"
+    />
+               
+
                   <span className="inline-flex items-center rounded-full bg-[color:var(--nans-lime)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[color:var(--nans-ink)]">
                     {u.tag}
                   </span>

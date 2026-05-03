@@ -21,7 +21,9 @@ export function Header() {
           <img src={logo} alt="NANS logo" width={40} height={40} className="h-10 w-10 rounded-full object-contain" />
           <div className="flex flex-col leading-none">
             <span className="font-display text-lg tracking-tight text-[color:var(--nans-green-deep)]">NANS GHANA</span>
-            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Nzema Students</span>
+
+            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground"></span>
+
           </div>
         </Link>
 

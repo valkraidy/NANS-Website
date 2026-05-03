@@ -1,3 +1,7 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Archivo+Black&display=swap");
+
+
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -6,8 +10,6 @@
 
 /* NANS — Bold editorial Ghanaian student-collective brand.
    Deep green + electric lime accent, cream surfaces, ink-black hero blocks. */
-
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Archivo+Black&display=swap");
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

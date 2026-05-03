@@ -4,6 +4,12 @@ import { ArrowRight, Calendar, ChevronLeft, ChevronRight, MapPin, Sparkles } fro
 import { SiteShell } from "@/components/site/SiteShell";
 import { Eyebrow } from "@/components/site/SectionHeader";
 
+import carda from "@/assets/images/carda.JPG";
+import cardb from "@/assets/images/cardb.JPG";
+import cardc from "@/assets/images/cardC.JPG";
+import card2 from "@/assets/images/card2.JPG";
+
+
 export const Route = createFileRoute("/news")({
   head: () => ({
     meta: [
@@ -20,9 +26,11 @@ const TABS = ["All Stories", "Upcoming", "Past Events"] as const;
 type Tab = typeof TABS[number];
 
 const STORIES = [
-  { tab: "Past Events", tag: "Announcements", date: "Aug 2026", title: "Meet Our Electoral Commission", body: "Meet NANS electoral commission for this year's general election. From chairperson to the members.", grad: "from-slate-700 to-slate-900" },
-  { tab: "Past Events", tag: "Past Events", date: "March 2026", title: "NANS celebrates Independence Day", body: "A thrilling week of athletics concluded in Takoradi, with the Tarkwa chapter taking home the championship trophy.", grad: "from-emerald-700 to-emerald-900" },
-  { tab: "Upcoming", tag: "Upcoming", date: "Nov 15, 2024", title: "NANS Membership Card Registration", body: "The NANS Ghana executives has rolled out NANS Membership Card Registration.", grad: "from-amber-500 to-amber-700" },
+
+  { tab: "Past Events", tag: "Announcements", date: "Aug 2026", title: "Meet Our Electoral Commission", body: "Meet NANS electoral commission for this year's general election. From chairperson to the members.", image:carda },
+  { tab: "Past Events", tag: "Past Events", date: "March 2026", title: "NANS celebrates Independence Day", body: "A thrilling week of athletics concluded in Takoradi, with the Tarkwa chapter taking home the championship trophy.",image:cardb,  },
+  { tab: "Upcoming", tag: "Upcoming", date: "Nov 15, 2024", title: "NANS Membership Card Registration", body: "The NANS Ghana executives has rolled out NANS Membership Card Registration.", image:cardc },
+
 ];
 
 function NewsPage() {
@@ -60,18 +68,19 @@ function NewsPage() {
 
       {/* Featured event */}
       <section className="bg-background py-12 md:py-16">
-        <div className="mx-auto max-w-7xl px-5 md:px-8">
+
+        <div className="mx-auto max-w-10xl px-50 md:px-70">
           <article className="grid overflow-hidden rounded-3xl bg-card shadow-xl ring-1 ring-border md:grid-cols-2">
-            <div className="relative bg-gradient-to-br from-emerald-800 to-emerald-950 p-10">
-              <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15), transparent 50%)" }} />
+            <div className="relative  p-10">
+              <div className="absolute inset-0 mx-auto  opacity-100" style={{ backgroundImage: `url(${card2})` }} />
+               <div className="relative inset-0 bg-black/50" />
+
+         <div className="relative z-10 flex h-full flex-col justify-between"></div>
               <div className="relative flex h-full flex-col justify-between">
                 <Sparkles className="h-8 w-8 text-yellow-300" />
                 <div className="text-center">
-                  <div className="mx-auto mb-4 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-amber-200 to-amber-500 font-display text-5xl text-[color:var(--nans-ink)]">
-                    GS
-                  </div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/70">National Association of Nzema Students</p>
-                  <p className="mt-3 font-display text-3xl text-yellow-300 italic">Congratulations</p>
+                 
+
                 </div>
                 <div />
               </div>
@@ -105,7 +114,14 @@ function NewsPage() {
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {list.map((s) => (
               <article key={s.title} className="overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                <div className={`relative aspect-[4/3] bg-gradient-to-br ${s.grad} p-5`}>
+
+                <div className={`relative aspect-[4/3] bg-gradient-to-br  p-5`}>
+                 <img
+                  src={s.image}
+     
+                    className="absolute inset-0 h-full w-full object-cover"
+                   />
+
                   <span className="inline-flex items-center rounded-full bg-[color:var(--nans-lime)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[color:var(--nans-ink)]">
                     {s.tag}
                   </span>
