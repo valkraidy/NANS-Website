@@ -17,15 +17,62 @@ export const Route = createFileRoute("/resources")({
 });
 
 type Kind = "pdf" | "doc" | "link";
-type Resource = { kind: Kind; size?: string; title: string; body: string };
+type Resource = {
+  kind: Kind;
+  size?: string;
+  title: string;
+  body: string;
+  link: string;
+};
+
 
 const RESOURCES: Resource[] = [
-  { kind: "pdf", size: "2.4 MB", title: "Constitution of NANS 2024", body: "Official governing document outlining the mission, rules, and structures of the National Association of Nzema Students." },
-  { kind: "doc", size: "450 KB", title: "Membership Application Form", body: "Editable document for new students wishing to register with their local and national NANS chapters." },
-  { kind: "link", title: "Nzema History Portal", body: "An external educational archive focused on the cultural heritage and history of the Nzema people." },
-  { kind: "pdf", size: "1.1 MB", title: "Scholarship Guide 2024", body: "A comprehensive guide on available bursaries and financial aid for Nzema students in tertiary institutions." },
-  { kind: "doc", size: "120 KB", title: "Event Proposal Template", body: "Standardized template for student leaders to propose new academic or cultural events for review." },
-  { kind: "pdf", size: "3.8 MB", title: "Academic Excellence Report", body: "Yearly overview of student achievements and academic progress within the Nzema community." },
+  {
+    kind: "pdf",
+    size: "2.4 MB",
+    title: "Constitution of NANS 2024",
+    body: "Official governing document outlining the mission, rules, and structures of the National Association of Nzema Students.",
+    link: "https://drive.google.com/drive/folders/1McHarSrnbhFdWHoVZKXFmxXS5IngxKk9?usp=drive_link",
+  },
+
+  {
+    kind: "doc",
+    size: "450 KB",
+    title: "Membership Application Form",
+    body: "Editable document for new students wishing to register with their local and national NANS chapters.",
+    link: "https://drive.google.com/drive/folders/1McHarSrnbhFdWHoVZKXFmxXS5IngxKk9?usp=drive_link",
+  },
+
+  {
+    kind: "link",
+    title: "Nzema History Portal",
+    body: "An external educational archive focused on the cultural heritage and history of the Nzema people.",
+    link: "https://drive.google.com/drive/folders/1McHarSrnbhFdWHoVZKXFmxXS5IngxKk9?usp=drive_link",
+  },
+
+  {
+    kind: "pdf",
+    size: "1.1 MB",
+    title: "Scholarship Guide 2024",
+    body: "A comprehensive guide on available bursaries and financial aid for Nzema students in tertiary institutions.",
+    link: "https://drive.google.com/drive/folders/1McHarSrnbhFdWHoVZKXFmxXS5IngxKk9?usp=drive_link",
+  },
+
+  {
+    kind: "doc",
+    size: "120 KB",
+    title: "Event Proposal Template",
+    body: "Standardized template for student leaders to propose new academic or cultural events for review.",
+    link: "https://drive.google.com/drive/folders/1McHarSrnbhFdWHoVZKXFmxXS5IngxKk9?usp=drive_link",
+  },
+
+  {
+    kind: "pdf",
+    size: "3.8 MB",
+    title: "Academic Excellence Report",
+    body: "Yearly overview of student achievements and academic progress within the Nzema community.",
+    link: "https://drive.google.com/drive/folders/1McHarSrnbhFdWHoVZKXFmxXS5IngxKk9?usp=drive_link",
+  },
 ];
 
 const TABS = ["All Resources", "Documents", "External Links"] as const;
@@ -116,9 +163,14 @@ function ResourceCard({ r }: { r: Resource }) {
       </div>
       <h3 className="mt-5 font-display text-lg leading-snug">{r.title}</h3>
       <p className="mt-2 flex-1 text-sm text-muted-foreground">{r.body}</p>
-      <button className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl border border-[color:var(--nans-green)] py-2.5 text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--nans-green-deep)] transition-colors hover:bg-[color:var(--nans-green-soft)]">
-        {meta.btn} <Btn className="h-3.5 w-3.5" />
-      </button>
+      <a
+  href={r.link}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl border border-[color:var(--nans-green)] py-2.5 text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--nans-green-deep)] transition-colors hover:bg-[color:var(--nans-green-soft)]"
+>
+  {meta.btn} <Btn className="h-3.5 w-3.5" />
+</a>
     </article>
   );
 }

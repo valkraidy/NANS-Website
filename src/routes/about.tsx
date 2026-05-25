@@ -11,6 +11,7 @@ import Isaac from "@/assets/images/Isaac.JPG";
 import Gloria from "@/assets/images/Gloria.JPG";
 import PRO from "@/assets/images/PRO.JPG";
 import Ernest from "@/assets/images/Ernest.JPG";
+import patroness from "@/assets/images/patroness.jpg"
 
 
 export const Route = createFileRoute("/about")({
@@ -28,15 +29,15 @@ export const Route = createFileRoute("/about")({
 const TIMELINE = [
 
 
-  { y: "1997", t: "The Foundation", d: "Establishment of the first student coordination council in the Nzema region, uniting diverse educational blocks." },
+  { y: "1996", t: "The Foundation", d: "Establishment of the first student coordination council in the Nzema region, uniting diverse educational blocks." },
   { y: "2010", t: "Academic Integration", d: "Launch of the NANS Scholarship Fund, providing vital support for underprivileged undergraduates pursuing higher education." },
-  { y: "2026", t: "Vision 2026", d: "Establishment of NANS office for administrative work." },
+  { y: "2026", t: "Vision 2026", d: "Establishment of NANS office for administrative work,Projected completion of a functional, furnished office space for NANS-GH to handle administrative tasks, student services and coordination more efficiently." },
 ];
 
 const LEADERS = [
-  { n: "Nana Ainoo Kwagyan III", r: "Patron", p: "0532388934", grad: "from-amber-300 to-amber-600",image:nana },
-  { n: "Dr. Clinton Blay", r: "Patron", p: "0545848236",image:doc },
-  { n: "-", r: "Patron", p: "0558082643", grad: "from-emerald-300 to-emerald-600" ,},
+  { n: "Nana Ainoo Kwagyan III", r: "Patron", p: "N/A", grad: "from-amber-300 to-amber-600",image:nana },
+  { n: "Dr. Clement Clinton Blay", r: "Patron", p: "N/A",image:doc },
+  { n: "Juliana Audria Dankwa", r: "Patroness", p: "N/A", grad: "from-emerald-300 to-emerald-600" ,image:patroness},
   
   { n: "Ernest Whajah", r: "President", p: "0532388934", grad: "from-amber-300 to-amber-600",image:Ernest },
   { n: "Charlotte Annor", r: "Vice President", p: "0545848236", grad: "from-rose-300 to-rose-600",image:Charlotte  },

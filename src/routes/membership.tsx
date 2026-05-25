@@ -89,8 +89,14 @@ function MembershipPage() {
                 Free Registration
               </span>
             </div>
+       
 
+
+
+
+        
             <div className="mt-6 grid gap-5">
+              {/*
               <Field label="Full Name"><input required placeholder="e.g. Kwame Boateng" className={input} /></Field>
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field label="Student ID"><input placeholder="Enter ID Number" className={input} /></Field>
@@ -101,6 +107,9 @@ function MembershipPage() {
                   </select>
                 </Field>
               </div>
+               */}
+
+                 {/*
               <Field label="Institution"><input placeholder="e.g. University of Ghana" className={input} /></Field>
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field label="Programme"><input placeholder="e.g. BSc. Computer Science" className={input} /></Field>
@@ -110,8 +119,9 @@ function MembershipPage() {
                     {[1,2,3,4,5,6].map((y) => <option key={y}>Level {y}00</option>)}
                   </select>
                 </Field>
-              </div>
-              <Field label="Hometown"><input placeholder="Your native town in Nzemaland" className={input} /></Field>
+              </div>*/}
+
+             {/* <Field label="Hometown"><input placeholder="Your native town in Nzemaland" className={input} /></Field>
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field label="Phone Number"><input placeholder="+233 ..." className={input} /></Field>
                 <Field label="Email Address"><input type="email" placeholder="email@example.com" className={input} /></Field>
@@ -121,9 +131,9 @@ function MembershipPage() {
                   <option value="" disabled>Select NANS Chapter</option>
                   {CHAPTERS.map((c) => <option key={c.slug + c.location}>{c.name} — {c.location}</option>)}
                 </select>
-              </Field>
+              </Field>*/}
 
-              <Field label="Passport Photo Upload">
+             {/*<Field label="Passport Photo Upload">
                 <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 p-8 text-center transition-colors hover:border-[color:var(--nans-green)] hover:bg-[color:var(--nans-green-soft)]/40">
                   <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[color:var(--nans-green-soft)] text-[color:var(--nans-green-deep)]">
                     <UploadCloud className="h-5 w-5" />
@@ -132,11 +142,16 @@ function MembershipPage() {
                   <p className="text-xs text-muted-foreground">PNG, JPG up to 2MB (must be a clear passport size)</p>
                   <input type="file" accept="image/png,image/jpeg" className="hidden" onChange={(e) => setFilename(e.target.files?.[0]?.name ?? null)} />
                 </label>
-              </Field>
+              </Field> */}
 
-              <button className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-[color:var(--nans-green)] px-6 py-4 text-sm font-bold text-white shadow-md transition-colors hover:bg-[color:var(--nans-green-deep)]">
-                Submit <ArrowRight className="h-4 w-4" />
-              </button>
+             <a
+  href="https://forms.gle/2PQt7UcCM7JxuLWEA"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-[color:var(--nans-green)] px-6 py-4 text-sm font-bold text-white shadow-md transition-colors hover:bg-[color:var(--nans-green-deep)]"
+>
+  Tap to register <ArrowRight className="h-4 w-4" />
+</a>
             </div>
           </form>
 

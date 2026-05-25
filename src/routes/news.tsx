@@ -6,7 +6,7 @@ import { Eyebrow } from "@/components/site/SectionHeader";
 
 import carda from "@/assets/images/carda.JPG";
 import cardb from "@/assets/images/cardb.JPG";
-import cardc from "@/assets/images/cardC.JPG";
+import cardc from "@/assets/images/cardc.JPG";
 import card2 from "@/assets/images/card2.JPG";
 
 
