@@ -86,7 +86,7 @@ function MembershipPage() {
             <div className="flex items-start justify-between gap-4">
               <h2 className="font-display text-3xl">Registration Form</h2>
               <span className="inline-flex shrink-0 items-center rounded-full bg-[color:var(--nans-lime)]/30 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[color:var(--nans-green-deep)]">
-                Free Registration
+                Free
               </span>
             </div>
        
