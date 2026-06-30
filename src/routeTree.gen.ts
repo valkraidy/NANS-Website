@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as InternshipRouteImport } from './routes/internship'
 import { Route as ChaptersRouteImport } from './routes/chapters'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -29,6 +30,11 @@ const NewsRoute = NewsRouteImport.update({
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InternshipRoute = InternshipRouteImport.update({
+  id: '/internship',
+  path: '/internship',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChaptersRoute = ChaptersRouteImport.update({
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/chapters': typeof ChaptersRoute
+  '/internship': typeof InternshipRoute
   '/membership': typeof MembershipRoute
   '/news': typeof NewsRoute
   '/resources': typeof ResourcesRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/chapters': typeof ChaptersRoute
+  '/internship': typeof InternshipRoute
   '/membership': typeof MembershipRoute
   '/news': typeof NewsRoute
   '/resources': typeof ResourcesRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/chapters': typeof ChaptersRoute
+  '/internship': typeof InternshipRoute
   '/membership': typeof MembershipRoute
   '/news': typeof NewsRoute
   '/resources': typeof ResourcesRoute
@@ -78,16 +87,25 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/chapters'
+    | '/internship'
     | '/membership'
     | '/news'
     | '/resources'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/chapters' | '/membership' | '/news' | '/resources'
+  to:
+    | '/'
+    | '/about'
+    | '/chapters'
+    | '/internship'
+    | '/membership'
+    | '/news'
+    | '/resources'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/chapters'
+    | '/internship'
     | '/membership'
     | '/news'
     | '/resources'
@@ -97,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ChaptersRoute: typeof ChaptersRoute
+  InternshipRoute: typeof InternshipRoute
   MembershipRoute: typeof MembershipRoute
   NewsRoute: typeof NewsRoute
   ResourcesRoute: typeof ResourcesRoute
@@ -123,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/membership'
       fullPath: '/membership'
       preLoaderRoute: typeof MembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/internship': {
+      id: '/internship'
+      path: '/internship'
+      fullPath: '/internship'
+      preLoaderRoute: typeof InternshipRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chapters': {
@@ -153,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ChaptersRoute: ChaptersRoute,
+  InternshipRoute: InternshipRoute,
   MembershipRoute: MembershipRoute,
   NewsRoute: NewsRoute,
   ResourcesRoute: ResourcesRoute,
