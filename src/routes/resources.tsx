@@ -54,7 +54,7 @@ const RESOURCES: Resource[] = [
     kind: "link",
     title: "Internship Registration Portal",
     body: "An link for students to register for internship opportunities with NANS Ghana.",
-    link: "/internship",
+    link: "/internship4",
   },
 
   {
