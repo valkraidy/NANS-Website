@@ -1,8 +1,6 @@
-# Internship Google Apps Script
+# Internship Application Google Apps Script
 
-Paste this into the Google Apps Script editor for the spreadsheet that should receive internship applications.
-
-Replace `PASTE_YOUR_SPREADSHEET_ID_HERE` with the real spreadsheet ID and make sure `SHEET_NAME` matches the exact tab name.
+Assign `SPREADSHEET_ID` with the real spreadsheet ID and make sure `SHEET_NAME` matches the exact tab name.
 
 ```javascript
 /**
