@@ -17,10 +17,14 @@ function doPost(e) {
 
     // Open the target spreadsheet and select the tab that should receive rows.
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(SHEET_NAME);
+    const sheet = ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0];
 
     if (!sheet) {
-      throw new Error("Sheet not found: " + SHEET_NAME);
+      throw new Error("No sheets found in the spreadsheet.");
+    }
+
+    if (sheet.getName() !== SHEET_NAME) {
+      console.warn("Using fallback sheet:", sheet.getName());
     }
 
     // The form may send JSON or form-encoded data, so support both.
@@ -77,7 +81,7 @@ function doGet() {
 
 ## What this expects
 
-- A Google Sheet with a tab named `Applications`
+- A Google Sheet with a tab named `Applications`, or another tab if you rely on the fallback to the first sheet
 - The form to send `timestamp`, `fullName`, `membershipId`, `phoneNumber`, `whatsappNumber`, `email`, `gender`, `hometown`, `institution`, `programme`, `currentLevel`, `startDate`, `endDate`, `preferredCompany`, `acceptAlternative`, `hasExperience`, and `additionalComments`
 - The web app to be redeployed after any script change
 
@@ -85,3 +89,6 @@ function doGet() {
 
 - The form in this repo is currently sending form-encoded data, so if you keep this script exactly as-is, it will still work because it falls back to `e.parameter`.
 - If you want JSON only, the frontend should send JSON and the Apps Script should keep `JSON.parse(e.postData.contents)`.
+- The internship form now submits through a same-origin server function, so the browser can show real success or failure instead of guessing.
+- Avoid direct browser `fetch(..., { mode: "no-cors" })` for this flow, because the browser cannot read the response and the UI can falsely claim success when the sheet write actually failed.
+- If you see `Sheet not found: Applications`, the spreadsheet tab name does not match the script. In your screenshot, the visible tab is `Sheet1`, so either rename it to `Applications` or change `SHEET_NAME` to `Sheet1`.

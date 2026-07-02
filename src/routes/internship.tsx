@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
-import { useState } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -13,17 +14,77 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { z } from "zod";
+
+const internshipSubmissionSchema = z.object({
+  fullName: z.string().min(1),
+  membershipId: z.string().min(1),
+  phoneNumber: z.string().min(1),
+  whatsappNumber: z.string().min(1),
+  email: z.string().email(),
+  gender: z.string().min(1),
+  hometown: z.string().min(1),
+  institution: z.string().min(1),
+  programme: z.string().min(1),
+  currentLevel: z.string().min(1),
+  startDate: z.string().min(1),
+  endDate: z.string().min(1),
+  preferredCompany: z.string().min(1),
+  acceptAlternative: z.string().min(1),
+  hasExperience: z.string().min(1),
+  additionalComments: z.string(),
+});
+
+type InternshipSubmission = z.infer<typeof internshipSubmissionSchema>;
+
+const GOOGLE_APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzu7a10CABiSBshHbR9T8MnfloetLgV4N-FkXnlViN1YdLnRR7hhdo3ryGKv0ZzWBtO/exec";
+
+const submitInternshipApplication = createServerFn({ method: "POST" })
+  .inputValidator((data: InternshipSubmission) => internshipSubmissionSchema.parse(data))
+  .handler(async ({ data }) => {
+    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...data,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+
+    const responseText = await response.text();
+
+    let parsedResponse: { success?: boolean; message?: string; error?: string };
+
+    try {
+      parsedResponse = JSON.parse(responseText);
+    } catch {
+      throw new Error("The sheet service returned an unreadable response.");
+    }
+
+    if (parsedResponse.success === false) {
+      throw new Error(parsedResponse.error || parsedResponse.message || "Your application was not saved.");
+    }
+
+    return {
+      message: parsedResponse.message || "Application submitted successfully! We'll contact you soon.",
+    };
+  });
 
 function RequiredMark() {
   return <span className="text-red-500">*</span>;
 }
 
 function DatePickerField({
+  id,
   label,
   required,
   value,
   onChange,
 }: {
+  id: string;
   label: string;
   required?: boolean;
   value?: Date;
@@ -31,12 +92,17 @@ function DatePickerField({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium mb-2">
+      <label htmlFor={id} className="block text-sm font-medium mb-2">
         {label} {required ? <RequiredMark /> : null}
       </label>
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="w-full justify-between px-4 py-2 h-10 font-normal">
+          <Button
+            id={id}
+            type="button"
+            variant="outline"
+            className="w-full justify-between px-4 py-2 h-10 font-normal"
+          >
             {value ? (
               format(value, "PPP")
             ) : (
@@ -95,7 +161,7 @@ function RouteComponent() {
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -118,7 +184,7 @@ function RouteComponent() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (
@@ -140,33 +206,11 @@ function RouteComponent() {
     setSubmitStatus({ type: null, message: "" });
 
     try {
-      // Prepare data for Google Sheets
-      const submissionData = {
-        ...formData,
-        timestamp: new Date().toISOString(),
-      };
+      const result = await submitInternshipApplication({ data: formData });
 
-      // Send data to Google Sheets
-      const payload = new URLSearchParams();
-
-      Object.entries(submissionData).forEach(([key, value]) => {
-        payload.append(key, String(value));
-      });
-
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbzu7a10CABiSBshHbR9T8MnfloetLgV4N-FkXnlViN1YdLnRR7hhdo3ryGKv0ZzWBtO/exec",
-        {
-          method: "POST",
-          mode: "no-cors", // Required for Google Apps Script
-          body: payload,
-        },
-      );
-
-      // Note: With 'no-cors' mode, we can't read the response
-      // So we assume success if no error is thrown
       setSubmitStatus({
         type: "success",
-        message: "Application submitted successfully! We'll contact you soon.",
+        message: result.message,
       });
 
       // Reset form
@@ -191,10 +235,12 @@ function RouteComponent() {
       setStartDateValue(undefined);
       setEndDateValue(undefined);
     } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong. Please try again or contact support.";
+
       console.error("Submission error:", error);
       setSubmitStatus({
         type: "error",
-        message: "Something went wrong. Please try again or contact support.",
+        message,
       });
     } finally {
       setIsSubmitting(false);
@@ -228,13 +274,15 @@ function RouteComponent() {
 
             {/* Full name */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="fullName" className="block text-sm font-medium mb-2">
                 Full Name <RequiredMark />
               </label>
               <input
+                id="fullName"
                 type="text"
                 name="fullName"
                 required
+                autoComplete="name"
                 placeholder="e.g. Kwame Boateng"
                 className="w-full px-4 py-2 rounded-lg border border-input bg-background"
                 value={formData.fullName}
@@ -244,13 +292,15 @@ function RouteComponent() {
 
             {/* Memebership card */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="membershipId" className="block text-sm font-medium mb-2">
                 Membership Card ID Number <RequiredMark />
               </label>
               <input
+                id="membershipId"
                 type="text"
                 name="membershipId"
                 required
+                autoComplete="off"
                 placeholder="Enter your membership ID"
                 className="w-full px-4 py-2 rounded-lg border border-input bg-background"
                 value={formData.membershipId}
@@ -261,13 +311,15 @@ function RouteComponent() {
             {/* Contacts */}
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label htmlFor="phoneNumber" className="block text-sm font-medium mb-2">
                   Active Call Contact <RequiredMark />
                 </label>
                 <input
+                  id="phoneNumber"
                   type="tel"
                   name="phoneNumber"
                   required
+                  autoComplete="tel"
                   placeholder="+233 ..."
                   className="w-full px-4 py-2 rounded-lg border border-input bg-background"
                   value={formData.phoneNumber}
@@ -275,13 +327,15 @@ function RouteComponent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label htmlFor="whatsappNumber" className="block text-sm font-medium mb-2">
                   WhatsApp Contact <RequiredMark />
                 </label>
                 <input
+                  id="whatsappNumber"
                   type="tel"
                   name="whatsappNumber"
                   required
+                  autoComplete="tel"
                   placeholder="+233 ..."
                   className="w-full px-4 py-2 rounded-lg border border-input bg-background"
                   value={formData.whatsappNumber}
@@ -292,13 +346,15 @@ function RouteComponent() {
 
             {/* Email Address */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="email" className="block text-sm font-medium mb-2">
                 Email Address <RequiredMark />
               </label>
               <input
+                id="email"
                 type="email"
                 name="email"
                 required
+                autoComplete="email"
                 placeholder="email@example.com"
                 className="w-full px-4 py-2 rounded-lg border border-input bg-background"
                 value={formData.email}
@@ -309,14 +365,17 @@ function RouteComponent() {
             {/* Gender */}
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label htmlFor="gender" className="block text-sm font-medium mb-2">
                   Gender <RequiredMark />
                 </label>
                 <Select
                   value={formData.gender}
                   onValueChange={(value) => handleRadioChange("gender", value)}
                 >
-                  <SelectTrigger className="w-full h-10 px-4 py-2 rounded-lg border border-input bg-background">
+                  <SelectTrigger
+                    id="gender"
+                    className="w-full h-10 px-4 py-2 rounded-lg border border-input bg-background"
+                  >
                     <SelectValue placeholder="Select Gender" />
                   </SelectTrigger>
                   <SelectContent>
@@ -327,13 +386,15 @@ function RouteComponent() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label htmlFor="hometown" className="block text-sm font-medium mb-2">
                   Home Town/Community in Nzema <RequiredMark />
                 </label>
                 <input
+                  id="hometown"
                   type="text"
                   name="hometown"
                   required
+                  autoComplete="address-level2"
                   placeholder="e.g. Axim, Half Assini"
                   className="w-full px-4 py-2 rounded-lg border border-input bg-background"
                   value={formData.hometown}
@@ -349,13 +410,15 @@ function RouteComponent() {
 
             {/* Institution */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="institution" className="block text-sm font-medium mb-2">
                 Name of Institution / Chapter <RequiredMark />
               </label>
               <input
+                id="institution"
                 type="text"
                 name="institution"
                 required
+                autoComplete="organization"
                 placeholder="e.g. University of Ghana / Accra Chapter"
                 className="w-full px-4 py-2 rounded-lg border border-input bg-background"
                 value={formData.institution}
@@ -365,13 +428,15 @@ function RouteComponent() {
 
             {/* Program Of Study */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="programme" className="block text-sm font-medium mb-2">
                 Programme of Study <RequiredMark />
               </label>
               <input
+                id="programme"
                 type="text"
                 name="programme"
                 required
+                autoComplete="off"
                 placeholder="e.g. BSc. Computer Science"
                 className="w-full px-4 py-2 rounded-lg border border-input bg-background"
                 value={formData.programme}
@@ -381,14 +446,17 @@ function RouteComponent() {
 
             {/* Current Level */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="currentLevel" className="block text-sm font-medium mb-2">
                 Current Level <RequiredMark />
               </label>
               <Select
                 value={formData.currentLevel}
                 onValueChange={(value) => handleRadioChange("currentLevel", value)}
               >
-                <SelectTrigger className="w-full h-10 px-4 py-2 rounded-lg border border-input bg-background">
+                <SelectTrigger
+                  id="currentLevel"
+                  className="w-full h-10 px-4 py-2 rounded-lg border border-input bg-background"
+                >
                   <SelectValue placeholder="Select your current level" />
                 </SelectTrigger>
                 <SelectContent>
@@ -403,12 +471,14 @@ function RouteComponent() {
             {/* Dates */}
             <div className="grid gap-5 sm:grid-cols-2">
               <DatePickerField
+                id="startDate"
                 label="Proposed Start Date"
                 required
                 value={startDateValue}
                 onChange={(date) => handleDateChange("startDate", date)}
               />
               <DatePickerField
+                id="endDate"
                 label="Proposed End Date"
                 required
                 value={endDateValue}
@@ -423,13 +493,15 @@ function RouteComponent() {
 
             {/* Preferred Company */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="preferredCompany" className="block text-sm font-medium mb-2">
                 Preferred Company / Institution in Nzema <RequiredMark />
               </label>
               <input
+                id="preferredCompany"
                 type="text"
                 name="preferredCompany"
                 required
+                autoComplete="off"
                 placeholder="e.g. Any company in Nzema"
                 className="w-full px-4 py-2 rounded-lg border border-input bg-background"
                 value={formData.preferredCompany}
@@ -502,11 +574,13 @@ function RouteComponent() {
 
             {/* Additional Comments */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label htmlFor="additionalComments" className="block text-sm font-medium mb-2">
                 Additional Comments or Special Requests
               </label>
               <textarea
+                id="additionalComments"
                 name="additionalComments"
+                autoComplete="off"
                 placeholder="Any additional information you'd like to share..."
                 rows={4}
                 className="w-full px-4 py-2 rounded-lg border border-input bg-background resize-none"
@@ -519,7 +593,7 @@ function RouteComponent() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 px-4 bg-[color:var(--nans-green)] text-white rounded-lg font-medium hover:bg-[color:var(--nans-green-deep)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-3 px-4 bg-nans-green text-white rounded-lg font-medium hover:bg-nans-green-deep disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? "Submitting..." : "Submit Application"}
           </button>
