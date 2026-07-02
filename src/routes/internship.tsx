@@ -36,11 +36,12 @@ function DatePickerField({
       </label>
       <Popover>
         <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-full justify-between px-4 py-2 h-10 font-normal"
-          >
-            {value ? format(value, "PPP") : <span className="text-muted-foreground">Pick a date</span>}
+          <Button variant="outline" className="w-full justify-between px-4 py-2 h-10 font-normal">
+            {value ? (
+              format(value, "PPP")
+            ) : (
+              <span className="text-muted-foreground">Pick a date</span>
+            )}
             <CalendarIcon className="h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -119,6 +120,22 @@ function RouteComponent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (
+      !formData.gender ||
+      !formData.currentLevel ||
+      !formData.acceptAlternative ||
+      !formData.hasExperience ||
+      !startDateValue ||
+      !endDateValue
+    ) {
+      setSubmitStatus({
+        type: "error",
+        message: "Please complete all required fields before submitting.",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus({ type: null, message: "" });
 
@@ -129,12 +146,24 @@ function RouteComponent() {
         timestamp: new Date().toISOString(),
       };
 
-      // For now, we'll just log it - we'll connect to Google Sheets later
-      console.log("Form Data:", submissionData);
+      // Send data to Google Sheets
+      const payload = new URLSearchParams();
 
-      // Simulate submission
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      Object.entries(submissionData).forEach(([key, value]) => {
+        payload.append(key, String(value));
+      });
 
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbzu7a10CABiSBshHbR9T8MnfloetLgV4N-FkXnlViN1YdLnRR7hhdo3ryGKv0ZzWBtO/exec",
+        {
+          method: "POST",
+          mode: "no-cors", // Required for Google Apps Script
+          body: payload,
+        },
+      );
+
+      // Note: With 'no-cors' mode, we can't read the response
+      // So we assume success if no error is thrown
       setSubmitStatus({
         type: "success",
         message: "Application submitted successfully! We'll contact you soon.",
@@ -283,7 +312,10 @@ function RouteComponent() {
                 <label className="block text-sm font-medium mb-2">
                   Gender <RequiredMark />
                 </label>
-                <Select value={formData.gender} onValueChange={(value) => handleRadioChange("gender", value)}>
+                <Select
+                  value={formData.gender}
+                  onValueChange={(value) => handleRadioChange("gender", value)}
+                >
                   <SelectTrigger className="w-full h-10 px-4 py-2 rounded-lg border border-input bg-background">
                     <SelectValue placeholder="Select Gender" />
                   </SelectTrigger>
