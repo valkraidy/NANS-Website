@@ -16,6 +16,44 @@ import {
 } from "@/components/ui/select";
 import { z } from "zod";
 
+const requiredFieldNames = [
+  "fullName",
+  "membershipId",
+  "phoneNumber",
+  "whatsappNumber",
+  "email",
+  "gender",
+  "hometown",
+  "institution",
+  "programme",
+  "currentLevel",
+  "startDate",
+  "endDate",
+  "preferredCompany",
+  "acceptAlternative",
+  "hasExperience",
+] as const;
+
+type RequiredFieldName = (typeof requiredFieldNames)[number];
+
+const defaultTouchedFields: Record<RequiredFieldName, boolean> = {
+  fullName: false,
+  membershipId: false,
+  phoneNumber: false,
+  whatsappNumber: false,
+  email: false,
+  gender: false,
+  hometown: false,
+  institution: false,
+  programme: false,
+  currentLevel: false,
+  startDate: false,
+  endDate: false,
+  preferredCompany: false,
+  acceptAlternative: false,
+  hasExperience: false,
+};
+
 const internshipSubmissionSchema = z.object({
   fullName: z.string().min(1),
   membershipId: z.string().min(1),
@@ -85,12 +123,18 @@ function DatePickerField({
   label,
   required,
   value,
+  invalid,
+  onFocus,
+  onBlur,
   onChange,
 }: {
   id: string;
   label: string;
   required?: boolean;
   value?: Date;
+  invalid?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
   onChange: (date?: Date) => void;
 }) {
   return (
@@ -104,7 +148,13 @@ function DatePickerField({
             id={id}
             type="button"
             variant="outline"
-            className="w-full justify-between px-4 py-2 h-10 font-normal"
+            onFocus={onFocus}
+            onBlur={onBlur}
+            className={`w-full justify-between px-4 py-2 h-10 font-normal transition-shadow focus:outline-none ${
+              invalid
+                ? "border-red-500 ring-2 ring-red-500/20"
+                : "border-input focus:ring-2 focus:ring-(--nans-green)/20"
+            }`}
           >
             {value ? (
               format(value, "PPP")
@@ -159,6 +209,7 @@ function RouteComponent() {
     "idle",
   );
   const successResetTimerRef = useRef<number | null>(null);
+  const [touchedFields, setTouchedFields] = useState(defaultTouchedFields);
   const [submitStatus, setSubmitStatus] = useState<{
     type: "success" | "error" | null;
     message: string;
@@ -167,22 +218,45 @@ function RouteComponent() {
     message: "",
   });
 
-  const isFormComplete =
-    formData.fullName.trim() &&
-    formData.membershipId.trim() &&
-    formData.phoneNumber.trim() &&
-    formData.whatsappNumber.trim() &&
-    formData.email.trim() &&
-    formData.gender &&
-    formData.hometown.trim() &&
-    formData.institution.trim() &&
-    formData.programme.trim() &&
-    formData.currentLevel &&
-    formData.startDate &&
-    formData.endDate &&
-    formData.preferredCompany.trim() &&
-    formData.acceptAlternative &&
-    formData.hasExperience;
+  const isFormComplete = requiredFieldNames.every((fieldName) => {
+    const value = formData[fieldName];
+    return typeof value === "string" ? value.trim().length > 0 : Boolean(value);
+  });
+
+  const isFieldInvalid = (fieldName: RequiredFieldName) => {
+    if (!touchedFields[fieldName]) {
+      return false;
+    }
+
+    const value = formData[fieldName];
+    return typeof value === "string" ? value.trim().length === 0 : !value;
+  };
+
+  const markTouched = (fieldName: RequiredFieldName) => {
+    setTouchedFields((previous) => ({ ...previous, [fieldName]: true }));
+  };
+
+  const markPreviousFieldsTouched = (fieldName: RequiredFieldName) => {
+    const fieldIndex = requiredFieldNames.indexOf(fieldName);
+
+    setTouchedFields((previous) => {
+      const next = { ...previous };
+
+      for (let index = 0; index < fieldIndex; index += 1) {
+        next[requiredFieldNames[index]!] = true;
+      }
+
+      return next;
+    });
+  };
+
+  const handleFieldFocus = (fieldName: RequiredFieldName) => () => {
+    markPreviousFieldsTouched(fieldName);
+  };
+
+  const markTouchedOnBlur = (fieldName: RequiredFieldName) => () => {
+    markTouched(fieldName);
+  };
 
   useEffect(
     () => () => {
@@ -215,6 +289,8 @@ function RouteComponent() {
       ...prev,
       [field]: date ? format(date, "yyyy-MM-dd") : "",
     }));
+
+    markTouched(field);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -239,6 +315,16 @@ function RouteComponent() {
     setSubmitButtonState("loading");
     setSubmitStatus({ type: null, message: "" });
 
+    setTouchedFields(
+      requiredFieldNames.reduce(
+        (accumulator, fieldName) => {
+          accumulator[fieldName] = true;
+          return accumulator;
+        },
+        { ...defaultTouchedFields },
+      ),
+    );
+
     let submissionSucceeded = false;
 
     try {
@@ -251,6 +337,7 @@ function RouteComponent() {
         message: result.message,
       });
       setSubmitButtonState("success");
+      setTouchedFields(defaultTouchedFields);
 
       if (successResetTimerRef.current !== null) {
         window.clearTimeout(successResetTimerRef.current);
@@ -338,7 +425,13 @@ function RouteComponent() {
                 required
                 autoComplete="name"
                 placeholder="e.g. Kwame Boateng"
-                className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                onFocus={handleFieldFocus("fullName")}
+                onBlur={markTouchedOnBlur("fullName")}
+                className={`w-full px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                  isFieldInvalid("fullName")
+                    ? "border-red-500 ring-2 ring-red-500/20"
+                    : "border-input focus:ring-2 ring-(--nans-green)/20"
+                }`}
                 value={formData.fullName}
                 onChange={handleInputChange}
               />
@@ -356,7 +449,13 @@ function RouteComponent() {
                 required
                 autoComplete="off"
                 placeholder="Enter your membership ID"
-                className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                onFocus={handleFieldFocus("membershipId")}
+                onBlur={markTouchedOnBlur("membershipId")}
+                className={`w-full px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                  isFieldInvalid("membershipId")
+                    ? "border-red-500 ring-2 ring-red-500/20"
+                    : "border-input focus:ring-2 ring-(--nans-green)/20"
+                }`}
                 value={formData.membershipId}
                 onChange={handleInputChange}
               />
@@ -375,7 +474,13 @@ function RouteComponent() {
                   required
                   autoComplete="tel"
                   placeholder="+233 ..."
-                  className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                  onFocus={handleFieldFocus("phoneNumber")}
+                  onBlur={markTouchedOnBlur("phoneNumber")}
+                  className={`w-full px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                    isFieldInvalid("phoneNumber")
+                      ? "border-red-500 ring-2 ring-red-500/20"
+                      : "border-input focus:ring-2 ring-(--nans-green)/20"
+                  }`}
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
                 />
@@ -391,7 +496,13 @@ function RouteComponent() {
                   required
                   autoComplete="tel"
                   placeholder="+233 ..."
-                  className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                  onFocus={handleFieldFocus("whatsappNumber")}
+                  onBlur={markTouchedOnBlur("whatsappNumber")}
+                  className={`w-full px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                    isFieldInvalid("whatsappNumber")
+                      ? "border-red-500 ring-2 ring-red-500/20"
+                      : "border-input focus:ring-2 ring-(--nans-green)/20"
+                  }`}
                   value={formData.whatsappNumber}
                   onChange={handleInputChange}
                 />
@@ -410,7 +521,13 @@ function RouteComponent() {
                 required
                 autoComplete="email"
                 placeholder="email@example.com"
-                className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                onFocus={handleFieldFocus("email")}
+                onBlur={markTouchedOnBlur("email")}
+                className={`w-full px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                  isFieldInvalid("email")
+                    ? "border-red-500 ring-2 ring-red-500/20"
+                    : "border-input focus:ring-2 ring-(--nans-green)/20"
+                }`}
                 value={formData.email}
                 onChange={handleInputChange}
               />
@@ -424,11 +541,20 @@ function RouteComponent() {
                 </label>
                 <Select
                   value={formData.gender}
-                  onValueChange={(value) => handleRadioChange("gender", value)}
+                  onValueChange={(value) => {
+                    handleRadioChange("gender", value);
+                    markTouched("gender");
+                  }}
                 >
                   <SelectTrigger
                     id="gender"
-                    className="w-full h-10 px-4 py-2 rounded-lg border border-input bg-background"
+                    onFocus={handleFieldFocus("gender")}
+                    onBlur={markTouchedOnBlur("gender")}
+                    className={`w-full h-10 px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                      isFieldInvalid("gender")
+                        ? "border-red-500 ring-2 ring-red-500/20"
+                        : "border-input focus:ring-2 ring-(--nans-green)/20"
+                    }`}
                   >
                     <SelectValue placeholder="Select Gender" />
                   </SelectTrigger>
@@ -450,7 +576,13 @@ function RouteComponent() {
                   required
                   autoComplete="address-level2"
                   placeholder="e.g. Axim, Half Assini"
-                  className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                  onFocus={handleFieldFocus("hometown")}
+                  onBlur={markTouchedOnBlur("hometown")}
+                  className={`w-full px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                    isFieldInvalid("hometown")
+                      ? "border-red-500 ring-2 ring-red-500/20"
+                      : "border-input focus:ring-2 ring-(--nans-green)/20"
+                  }`}
                   value={formData.hometown}
                   onChange={handleInputChange}
                 />
@@ -474,7 +606,13 @@ function RouteComponent() {
                 required
                 autoComplete="organization"
                 placeholder="e.g. University of Ghana / Accra Chapter"
-                className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                onFocus={handleFieldFocus("institution")}
+                onBlur={markTouchedOnBlur("institution")}
+                className={`w-full px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                  isFieldInvalid("institution")
+                    ? "border-red-500 ring-2 ring-red-500/20"
+                    : "border-input focus:ring-2 ring-(--nans-green)/20"
+                }`}
                 value={formData.institution}
                 onChange={handleInputChange}
               />
@@ -492,7 +630,13 @@ function RouteComponent() {
                 required
                 autoComplete="off"
                 placeholder="e.g. BSc. Computer Science"
-                className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                onFocus={handleFieldFocus("programme")}
+                onBlur={markTouchedOnBlur("programme")}
+                className={`w-full px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                  isFieldInvalid("programme")
+                    ? "border-red-500 ring-2 ring-red-500/20"
+                    : "border-input focus:ring-2 ring-(--nans-green)/20"
+                }`}
                 value={formData.programme}
                 onChange={handleInputChange}
               />
@@ -505,11 +649,20 @@ function RouteComponent() {
               </label>
               <Select
                 value={formData.currentLevel}
-                onValueChange={(value) => handleRadioChange("currentLevel", value)}
+                onValueChange={(value) => {
+                  handleRadioChange("currentLevel", value);
+                  markTouched("currentLevel");
+                }}
               >
                 <SelectTrigger
                   id="currentLevel"
-                  className="w-full h-10 px-4 py-2 rounded-lg border border-input bg-background"
+                  onFocus={handleFieldFocus("currentLevel")}
+                  onBlur={markTouchedOnBlur("currentLevel")}
+                  className={`w-full h-10 px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                    isFieldInvalid("currentLevel")
+                      ? "border-red-500 ring-2 ring-red-500/20"
+                      : "border-input focus:ring-2 ring-(--nans-green)/20"
+                  }`}
                 >
                   <SelectValue placeholder="Select your current level" />
                 </SelectTrigger>
@@ -529,6 +682,9 @@ function RouteComponent() {
                 label="Proposed Start Date"
                 required
                 value={startDateValue}
+                invalid={isFieldInvalid("startDate")}
+                onFocus={handleFieldFocus("startDate")}
+                onBlur={markTouchedOnBlur("startDate")}
                 onChange={(date) => handleDateChange("startDate", date)}
               />
               <DatePickerField
@@ -536,6 +692,9 @@ function RouteComponent() {
                 label="Proposed End Date"
                 required
                 value={endDateValue}
+                invalid={isFieldInvalid("endDate")}
+                onFocus={handleFieldFocus("endDate")}
+                onBlur={markTouchedOnBlur("endDate")}
                 onChange={(date) => handleDateChange("endDate", date)}
               />
             </div>
@@ -557,7 +716,13 @@ function RouteComponent() {
                 required
                 autoComplete="off"
                 placeholder="e.g. Any company in Nzema"
-                className="w-full px-4 py-2 rounded-lg border border-input bg-background"
+                onFocus={handleFieldFocus("preferredCompany")}
+                onBlur={markTouchedOnBlur("preferredCompany")}
+                className={`w-full px-4 py-2 rounded-lg border bg-background transition-shadow focus:outline-none ${
+                  isFieldInvalid("preferredCompany")
+                    ? "border-red-500 ring-2 ring-red-500/20"
+                    : "border-input focus:ring-2 ring-(--nans-green)/20"
+                }`}
                 value={formData.preferredCompany}
                 onChange={handleInputChange}
               />
@@ -576,6 +741,8 @@ function RouteComponent() {
                     name="acceptAlternative"
                     value="yes"
                     checked={formData.acceptAlternative === "yes"}
+                    onFocus={handleFieldFocus("acceptAlternative")}
+                    onBlur={markTouchedOnBlur("acceptAlternative")}
                     onChange={(e) => handleRadioChange("acceptAlternative", e.target.value)}
                     className="w-4 h-4"
                   />
@@ -587,6 +754,8 @@ function RouteComponent() {
                     name="acceptAlternative"
                     value="no"
                     checked={formData.acceptAlternative === "no"}
+                    onFocus={handleFieldFocus("acceptAlternative")}
+                    onBlur={markTouchedOnBlur("acceptAlternative")}
                     onChange={(e) => handleRadioChange("acceptAlternative", e.target.value)}
                     className="w-4 h-4"
                   />
@@ -607,6 +776,8 @@ function RouteComponent() {
                     name="hasExperience"
                     value="yes"
                     checked={formData.hasExperience === "yes"}
+                    onFocus={handleFieldFocus("hasExperience")}
+                    onBlur={markTouchedOnBlur("hasExperience")}
                     onChange={(e) => handleRadioChange("hasExperience", e.target.value)}
                     className="w-4 h-4"
                   />
@@ -618,6 +789,8 @@ function RouteComponent() {
                     name="hasExperience"
                     value="no"
                     checked={formData.hasExperience === "no"}
+                    onFocus={handleFieldFocus("hasExperience")}
+                    onBlur={markTouchedOnBlur("hasExperience")}
                     onChange={(e) => handleRadioChange("hasExperience", e.target.value)}
                     className="w-4 h-4"
                   />
@@ -651,7 +824,7 @@ function RouteComponent() {
               submitButtonState === "success"
                 ? "bg-nans-green hover:bg-nans-green-deep"
                 : !isFormComplete
-                  ? "bg-gray-600 text-muted-foreground"
+                  ? "bg-gray-400 text-gray-200"
                   : "bg-nans-green hover:bg-nans-green-deep"
             }`}
           >
