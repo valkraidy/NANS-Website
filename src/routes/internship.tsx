@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Check, Loader2 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -152,6 +152,10 @@ function RouteComponent() {
   const [endDateValue, setEndDateValue] = useState<Date>();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitButtonState, setSubmitButtonState] = useState<"idle" | "loading" | "success">(
+    "idle",
+  );
+  const successResetTimerRef = useRef<number | null>(null);
   const [submitStatus, setSubmitStatus] = useState<{
     type: "success" | "error" | null;
     message: string;
@@ -159,6 +163,15 @@ function RouteComponent() {
     type: null,
     message: "",
   });
+
+  useEffect(
+    () => () => {
+      if (successResetTimerRef.current !== null) {
+        window.clearTimeout(successResetTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -203,15 +216,29 @@ function RouteComponent() {
     }
 
     setIsSubmitting(true);
+    setSubmitButtonState("loading");
     setSubmitStatus({ type: null, message: "" });
+
+    let submissionSucceeded = false;
 
     try {
       const result = await submitInternshipApplication({ data: formData });
+
+      submissionSucceeded = true;
 
       setSubmitStatus({
         type: "success",
         message: result.message,
       });
+      setSubmitButtonState("success");
+
+      if (successResetTimerRef.current !== null) {
+        window.clearTimeout(successResetTimerRef.current);
+      }
+
+      successResetTimerRef.current = window.setTimeout(() => {
+        setSubmitButtonState("idle");
+      }, 2200);
 
       // Reset form
       setFormData({
@@ -238,12 +265,16 @@ function RouteComponent() {
       const message = error instanceof Error ? error.message : "Something went wrong. Please try again or contact support.";
 
       console.error("Submission error:", error);
+      setSubmitButtonState("idle");
       setSubmitStatus({
         type: "error",
         message,
       });
     } finally {
       setIsSubmitting(false);
+      if (!submissionSucceeded) {
+        setSubmitButtonState("idle");
+      }
     }
   };
 
@@ -592,10 +623,31 @@ function RouteComponent() {
 
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 px-4 bg-nans-green text-white rounded-lg font-medium hover:bg-nans-green-deep disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            disabled={isSubmitting || submitButtonState === "success"}
+            className={`w-full rounded-lg px-4 py-3 font-medium text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-70 ${
+              submitButtonState === "success"
+                ? "bg-nans-green hover:bg-nans-green-deep"
+                : "bg-nans-green hover:bg-nans-green-deep"
+            }`}
           >
-            {isSubmitting ? "Submitting..." : "Submit Application"}
+            {submitButtonState === "loading" ? (
+              <span className="inline-flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Submitting...
+              </span>
+            ) : submitButtonState === "success" ? (
+              <span className="inline-flex items-center justify-center gap-2">
+                <span
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full animate-nans-check-pop"
+                  style={{ backgroundColor: "rgba(15, 81, 50, 0.1)" }}
+                >
+                  <Check className="h-3.5 w-3.5" />
+                </span>
+                Submitted
+              </span>
+            ) : (
+              "Submit Application"
+            )}
           </button>
         </form>
       </div>
