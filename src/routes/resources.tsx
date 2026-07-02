@@ -50,6 +50,13 @@ const RESOURCES: Resource[] = [
     link: "https://drive.google.com/drive/folders/1McHarSrnbhFdWHoVZKXFmxXS5IngxKk9?usp=drive_link",
   },
 
+    {
+    kind: "link",
+    title: "Internship Registration Portal",
+    body: "An link for students to register for internship opportunities with NANS Ghana.",
+    link: "/internship",
+  },
+
   {
     kind: "pdf",
     size: "1.1 MB",
