@@ -65,11 +65,14 @@ const submitInternshipApplication = createServerFn({ method: "POST" })
     }
 
     if (parsedResponse.success === false) {
-      throw new Error(parsedResponse.error || parsedResponse.message || "Your application was not saved.");
+      throw new Error(
+        parsedResponse.error || parsedResponse.message || "Your application was not saved.",
+      );
     }
 
     return {
-      message: parsedResponse.message || "Application submitted successfully! We'll contact you soon.",
+      message:
+        parsedResponse.message || "Application submitted successfully! We'll contact you soon.",
     };
   });
 
@@ -163,6 +166,23 @@ function RouteComponent() {
     type: null,
     message: "",
   });
+
+  const isFormComplete =
+    formData.fullName.trim() &&
+    formData.membershipId.trim() &&
+    formData.phoneNumber.trim() &&
+    formData.whatsappNumber.trim() &&
+    formData.email.trim() &&
+    formData.gender &&
+    formData.hometown.trim() &&
+    formData.institution.trim() &&
+    formData.programme.trim() &&
+    formData.currentLevel &&
+    formData.startDate &&
+    formData.endDate &&
+    formData.preferredCompany.trim() &&
+    formData.acceptAlternative &&
+    formData.hasExperience;
 
   useEffect(
     () => () => {
@@ -262,7 +282,10 @@ function RouteComponent() {
       setStartDateValue(undefined);
       setEndDateValue(undefined);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Something went wrong. Please try again or contact support.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again or contact support.";
 
       console.error("Submission error:", error);
       setSubmitButtonState("idle");
@@ -623,11 +646,13 @@ function RouteComponent() {
 
           <button
             type="submit"
-            disabled={isSubmitting || submitButtonState === "success"}
+            disabled={isSubmitting || submitButtonState === "success" || !isFormComplete}
             className={`w-full rounded-lg px-4 py-3 font-medium text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-70 ${
               submitButtonState === "success"
                 ? "bg-nans-green hover:bg-nans-green-deep"
-                : "bg-nans-green hover:bg-nans-green-deep"
+                : !isFormComplete
+                  ? "bg-gray-600 text-muted-foreground"
+                  : "bg-nans-green hover:bg-nans-green-deep"
             }`}
           >
             {submitButtonState === "loading" ? (
