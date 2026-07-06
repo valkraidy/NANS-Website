@@ -10,7 +10,7 @@ Assign `SPREADSHEET_ID` with the real spreadsheet ID and make sure `SHEET_NAME` 
 function doPost(e) {
   try {
     // Update these two values to match your Google Sheet.
-    const SPREADSHEET_ID = "1IO_-hzbIJstYyTGI2GgPs9fJVb4dRrEeYAUQhjvxPNw";
+    const SPREADSHEET_ID = "Enter_your_actual_google_script_id_it_can_be_found_in_the_sheet_link";
     const SHEET_NAME = "Applications";
 
     // Open the target spreadsheet and select the tab that should receive rows.

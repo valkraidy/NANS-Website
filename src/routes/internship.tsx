@@ -76,7 +76,7 @@ const internshipSubmissionSchema = z.object({
 type InternshipSubmission = z.infer<typeof internshipSubmissionSchema>;
 
 const GOOGLE_APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzu7a10CABiSBshHbR9T8MnfloetLgV4N-FkXnlViN1YdLnRR7hhdo3ryGKv0ZzWBtO/exec";
+  "https://script.google.com/macros/s/AKfycbxqgBMaudShTPTrEQtuCJ61g0ob2ksW3m34IqRCtNemtgqNWyPecaPfNmSo7whAlu4V/exec";
 
 const submitInternshipApplication = createServerFn({ method: "POST" })
   .inputValidator((data: InternshipSubmission) => internshipSubmissionSchema.parse(data))
@@ -561,7 +561,7 @@ function RouteComponent() {
                   <SelectContent>
                     <SelectItem value="Male">Male</SelectItem>
                     <SelectItem value="Female">Female</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
+                    {/* <SelectItem value="Other">Other</SelectItem> */}
                   </SelectContent>
                 </Select>
               </div>
