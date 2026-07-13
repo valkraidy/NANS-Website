@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
 import { CalendarIcon, Check, Loader2 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
@@ -78,41 +77,44 @@ type InternshipSubmission = z.infer<typeof internshipSubmissionSchema>;
 const GOOGLE_APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbxqgBMaudShTPTrEQtuCJ61g0ob2ksW3m34IqRCtNemtgqNWyPecaPfNmSo7whAlu4V/exec";
 
-const submitInternshipApplication = createServerFn({ method: "POST" })
-  .inputValidator((data: InternshipSubmission) => internshipSubmissionSchema.parse(data))
-  .handler(async ({ data }) => {
-    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...data,
-        timestamp: new Date().toISOString(),
-      }),
-    });
+async function submitInternshipApplication({ data }: { data: InternshipSubmission }) {
+  const parsedData = internshipSubmissionSchema.parse(data);
 
-    const responseText = await response.text();
-
-    let parsedResponse: { success?: boolean; message?: string; error?: string };
-
-    try {
-      parsedResponse = JSON.parse(responseText);
-    } catch {
-      throw new Error("The sheet service returned an unreadable response.");
-    }
-
-    if (parsedResponse.success === false) {
-      throw new Error(
-        parsedResponse.error || parsedResponse.message || "Your application was not saved.",
-      );
-    }
-
-    return {
-      message:
-        parsedResponse.message || "Application submitted successfully! We'll contact you soon.",
-    };
+  const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: {
+      // text/plain avoids a CORS preflight, which Apps Script's web app doesn't handle.
+      // The body is still JSON text, and the Apps Script side already does
+      // JSON.parse(e.postData.contents), so this doesn't change what's received.
+      "Content-Type": "text/plain;charset=utf-8",
+    },
+    body: JSON.stringify({
+      ...parsedData,
+      timestamp: new Date().toISOString(),
+    }),
   });
+
+  const responseText = await response.text();
+
+  let parsedResponse: { success?: boolean; message?: string; error?: string };
+
+  try {
+    parsedResponse = JSON.parse(responseText);
+  } catch {
+    throw new Error("The sheet service returned an unreadable response.");
+  }
+
+  if (parsedResponse.success === false) {
+    throw new Error(
+      parsedResponse.error || parsedResponse.message || "Your application was not saved.",
+    );
+  }
+
+  return {
+    message:
+      parsedResponse.message || "Application submitted successfully! We'll contact you soon.",
+  };
+}
 
 function RequiredMark() {
   return <span className="text-red-500">*</span>;
